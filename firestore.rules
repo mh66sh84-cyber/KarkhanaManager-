@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Step 1 has no data writes. Step 3 will add validated profile writes.
+    // Only the signed-in owner can read their exact business profile.
+    match /businesses/{businessId} {
+      allow get: if request.auth != null && request.auth.uid == businessId;
+      allow list, create, update, delete: if false;
+    }
+    // Worker/trader collections remain closed until their modules are built.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
