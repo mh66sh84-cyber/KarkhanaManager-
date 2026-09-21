@@ -1,0 +1,37 @@
+name: Build Karakhana APK AAB
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter project
+        run: python3 create_project.py --org com.saddam
+
+      - name: Build APK and AAB
+        working-directory: karakhana_ledger
+        run: |
+          flutter build apk --debug
+          flutter build appbundle --debug
+
+      - name: Download APK and AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: Karakhana-APK-AAB
+          path: |
+            karakhana_ledger/build/app/outputs/flutter-apk/app-debug.apk
+            karakhana_ledger/build/app/outputs/bundle/debug/app-debug.aab
